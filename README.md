@@ -1,1 +1,0 @@
-# EcoGenius----GS----Python
