@@ -238,7 +238,14 @@ def insert_service():
     id_usuario = input("Digite o ID do usuário: ").strip()
     nm_servico = input("Digite o nome do serviço: ").strip()
     ds_servico = input("Digite a descrição do serviço: ").strip()
-    tipo_servico = input("Digite o tipo do serviço: ").strip()
+
+    # Validando o tipo de serviço
+    while True:
+        tipo_servico = input("Digite o tipo do serviço (Consulta, Dicas, Informação ou Energia): ").strip().upper()
+        if tipo_servico in ['CONSULTA', 'DICAS', 'INFORMACAO', 'ENERGIA']:
+            break
+        else:
+            print("Tipo de serviço inválido. Por favor, escolha entre Consulta, Dicas, Informação ou Energia.")
 
     query = """INSERT INTO t_servicos (id_servico, id_usuario, nm_servico, ds_servico, tipo_servico)
                VALUES (seq_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_servico, :tipo_servico)"""
@@ -249,7 +256,14 @@ def update_service():
     id_servico = input("Digite o ID do serviço a ser atualizado: ").strip()
     nm_servico = input("Digite o novo nome do serviço: ").strip()
     ds_servico = input("Digite a nova descrição do serviço: ").strip()
-    tipo_servico = input("Digite o novo tipo do serviço: ").strip()
+
+    # Validando o tipo de serviço
+    while True:
+        tipo_servico = input("Digite o novo tipo do serviço (Consulta, Dicas, Informação ou Energia): ").strip().upper()
+        if tipo_servico in ['CONSULTA', 'DICAS', 'INFORMACAO', 'ENERGIA']:
+            break
+        else:
+            print("Tipo de serviço inválido. Por favor, escolha entre CConsulta, Dicas, Informação ou Energia.")
 
     query = """UPDATE t_servicos
                SET nm_servico = :nm_servico, ds_servico = :ds_servico, tipo_servico = :tipo_servico
@@ -275,62 +289,83 @@ def query_services():
 # Consulta 1: Filtrar usuários por nome
 def query_users_by_name():
     """
-    Consulta os usuários no banco de dados filtrando pelo nome.
+    Consulta 1: Filtrar usuários por nome.
     """
-    nome = input("Digite o nome do usuário para filtrar: ").strip()
-    query = "SELECT * FROM t_usuario WHERE UPPER(nm_usuario) LIKE UPPER(:nome)"
-    
-    # Executa a consulta com o parâmetro nome
-    results = execute_query(query, {'nome': f'%{nome}%'}, fetch=True)
-    
-    if results:
-        colunas = [desc[0] for desc in get_connection().cursor().description]  # Pegando os nomes das colunas
-        dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
-        print(f"\nUsuários encontrados com o nome '{nome}':")
-        for dado in dados:
-            print(dado)
-    else:
-        print("Nenhum usuário encontrado com esse nome.")
+    try:
+        nome = input("Digite o nome do usuário para filtrar: ").strip()
+        query = "SELECT * FROM t_usuario WHERE UPPER(nm_usuario) LIKE UPPER(:nome)"
+        
+        # Executa a consulta com o parâmetro nome
+        results = execute_query(query, {'nome': f'%{nome}%'}, fetch=True)
+        
+        if results:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(query, {'nome': f'%{nome}%'})
+            colunas = [desc[0] for desc in cursor.description]  # Pegando os nomes das colunas
+            
+            dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+            print(f"\nUsuários encontrados com o nome '{nome}':")
+            for dado in dados:
+                print(dado)
+        else:
+            print("Nenhum usuário encontrado com esse nome.")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
 
 # Consulta 2: Filtrar ideias por nome
 def query_ideas_by_name():
     """
-    Consulta as ideias no banco de dados filtrando pelo nome.
+    Consulta 2: Filtrar ideias por nome.
     """
-    nome_ideia = input("Digite o nome da ideia para filtrar: ").strip()
-    query = "SELECT * FROM t_ideias WHERE UPPER(nm_ideia) LIKE UPPER(:nome_ideia)"
-    
-    # Executa a consulta com o parâmetro nome_ideia
-    results = execute_query(query, {'nome_ideia': f'%{nome_ideia}%'}, fetch=True)
-    
-    if results:
-        colunas = [desc[0] for desc in get_connection().cursor().description]  # Pegando os nomes das colunas
-        dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
-        print(f"\nIdeias encontradas com o nome '{nome_ideia}':")
-        for dado in dados:
-            print(dado)
-    else:
-        print("Nenhuma ideia encontrada com esse nome.")
+    try:
+        nome_ideia = input("Digite o nome da ideia para filtrar: ").strip()
+        query = "SELECT * FROM t_ideias WHERE UPPER(nm_ideia) LIKE UPPER(:nome_ideia)"
+        
+        # Executa a consulta com o parâmetro nome_ideia
+        results = execute_query(query, {'nome_ideia': f'%{nome_ideia}%'}, fetch=True)
+        
+        if results:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(query, {'nome_ideia': f'%{nome_ideia}%'})
+            colunas = [desc[0] for desc in cursor.description]  # Pegando os nomes das colunas
+            
+            dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+            print(f"\nIdeias encontradas com o nome '{nome_ideia}':")
+            for dado in dados:
+                print(dado)
+        else:
+            print("Nenhuma ideia encontrada com esse nome.")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
 
 # Consulta 3: Filtrar ideias por descrição
 def query_ideas_by_description():
     """
-    Consulta as ideias no banco de dados filtrando pela descrição.
+    Consulta 3: Filtrar ideias por descrição.
     """
-    descricao = input("Digite a descrição da ideia para filtrar: ").strip()
-    query = "SELECT * FROM t_ideias WHERE UPPER(ds_descricao) LIKE UPPER(:descricao)"
-    
-    # Executa a consulta com o parâmetro descrição
-    results = execute_query(query, {'descricao': f'%{descricao}%'}, fetch=True)
-    
-    if results:
-        colunas = [desc[0] for desc in get_connection().cursor().description]  # Pegando os nomes das colunas
-        dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
-        print(f"\nIdeias encontradas com a descrição '{descricao}':")
-        for dado in dados:
-            print(dado)
-    else:
-        print("Nenhuma ideia encontrada com essa descrição.")
+    try:
+        descricao = input("Digite a descrição da ideia para filtrar: ").strip()
+        query = "SELECT * FROM t_ideias WHERE UPPER(ds_descricao) LIKE UPPER(:descricao)"
+        
+        # Executa a consulta com o parâmetro descrição
+        results = execute_query(query, {'descricao': f'%{descricao}%'}, fetch=True)
+        
+        if results:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(query, {'descricao': f'%{descricao}%'})
+            colunas = [desc[0] for desc in cursor.description]  # Pegando os nomes das colunas
+            
+            dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+            print(f"\nIdeias encontradas com a descrição '{descricao}':")
+            for dado in dados:
+                print(dado)
+        else:
+            print("Nenhuma ideia encontrada com essa descrição.")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
 
 # Exportação de dados para JSON
 def export_data_menu():
