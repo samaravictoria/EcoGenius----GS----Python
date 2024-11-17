@@ -292,53 +292,45 @@ def query_users_by_name():
     else:
         print("Nenhum usuário encontrado com esse nome.")
 
-# Consulta 2: Filtrar ideias por categoria e data de criação
-def query_ideas_by_category_and_date():
+# Consulta 2: Filtrar ideias por nome
+def query_ideas_by_name():
     """
-    Consulta as ideias no banco de dados filtrando por categoria e data de criação.
+    Consulta as ideias no banco de dados filtrando pelo nome.
     """
-    categoria = input("Digite a categoria das ideias para filtrar: ").strip()
-    data_criacao = input("Digite a data de criação das ideias (YYYY-MM-DD): ").strip()
+    nome_ideia = input("Digite o nome da ideia para filtrar: ").strip()
+    query = "SELECT * FROM t_ideias WHERE UPPER(nm_ideia) LIKE UPPER(:nome_ideia)"
     
-    if validate_date(data_criacao):
-        query = """SELECT * FROM t_ideias WHERE UPPER(ds_categoria) = UPPER(:categoria) 
-                   AND dt_criacao >= TO_DATE(:data_criacao, 'YYYY-MM-DD')"""
-        
-        # Executa a consulta com os parâmetros categoria e data de criação
-        results = execute_query(query, {'categoria': categoria, 'data_criacao': data_criacao}, fetch=True)
-        
-        if results:
-            colunas = [desc[0] for desc in get_connection().cursor().description]
-            dados = [dict(zip(colunas, linha)) for linha in results]
-            print(f"\nIdeias encontradas na categoria '{categoria}' a partir de {data_criacao}:")
-            for dado in dados:
-                print(dado)
-        else:
-            print("Nenhuma ideia encontrada com os filtros informados.")
+    # Executa a consulta com o parâmetro nome_ideia
+    results = execute_query(query, {'nome_ideia': f'%{nome_ideia}%'}, fetch=True)
+    
+    if results:
+        colunas = [desc[0] for desc in get_connection().cursor().description]  # Pegando os nomes das colunas
+        dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+        print(f"\nIdeias encontradas com o nome '{nome_ideia}':")
+        for dado in dados:
+            print(dado)
+    else:
+        print("Nenhuma ideia encontrada com esse nome.")
 
-# Consulta 3: Filtrar serviços por status e data de criação
-def query_services_by_status_and_date():
+# Consulta 3: Filtrar ideias por descrição
+def query_ideas_by_description():
     """
-    Consulta os serviços no banco de dados filtrando por status e data de criação.
+    Consulta as ideias no banco de dados filtrando pela descrição.
     """
-    status = input("Digite o status do serviço para filtrar (ex: 'Em andamento'): ").strip()
-    data_criacao = input("Digite a data de criação do serviço (YYYY-MM-DD): ").strip()
-
-    if validate_date(data_criacao):
-        query = """SELECT * FROM t_servicos WHERE UPPER(ds_status) = UPPER(:status) 
-                   AND dt_criacao >= TO_DATE(:data_criacao, 'YYYY-MM-DD')"""
-        
-        # Executa a consulta com os parâmetros status e data de criação
-        results = execute_query(query, {'status': status, 'data_criacao': data_criacao}, fetch=True)
-        
-        if results:
-            colunas = [desc[0] for desc in get_connection().cursor().description]
-            dados = [dict(zip(colunas, linha)) for linha in results]
-            print(f"\nServiços encontrados com o status '{status}' a partir de {data_criacao}:")
-            for dado in dados:
-                print(dado)
-        else:
-            print("Nenhum serviço encontrado com os filtros informados.")
+    descricao = input("Digite a descrição da ideia para filtrar: ").strip()
+    query = "SELECT * FROM t_ideias WHERE UPPER(ds_descricao) LIKE UPPER(:descricao)"
+    
+    # Executa a consulta com o parâmetro descrição
+    results = execute_query(query, {'descricao': f'%{descricao}%'}, fetch=True)
+    
+    if results:
+        colunas = [desc[0] for desc in get_connection().cursor().description]  # Pegando os nomes das colunas
+        dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+        print(f"\nIdeias encontradas com a descrição '{descricao}':")
+        for dado in dados:
+            print(dado)
+    else:
+        print("Nenhuma ideia encontrada com essa descrição.")
 
 # Exportação de dados para JSON
 def export_data_menu():
