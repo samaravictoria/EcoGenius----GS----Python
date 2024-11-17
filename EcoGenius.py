@@ -39,14 +39,14 @@ def get_connection():
 # Função para exibir o menu principal
 def main_menu():
     while True:
-        print("\n======== MENU PRINCIPAL ========")
+        print("\n--- Menu Principal ---")
         print("1. Gerenciar Usuários")
         print("2. Gerenciar Ideias")
         print("3. Gerenciar Serviços")
         print("4. Exportar Dados")
         print("5. Sair")
-        print("================================")
-
+        print("----------------------")
+        
         choice = input("Escolha uma opção: ").strip()
         if choice == '1':
             user_menu()
@@ -57,10 +57,9 @@ def main_menu():
         elif choice == '4':
             export_data_menu()
         elif choice == '5':
-            print("Encerrando o programa...")
             break
         else:
-            print("Opção inválida. Tente novamente.")
+            print("Opção inválida. Tente novamente.")   
 
 # Utilitário para validar datas
 def validate_date(date_str):
@@ -85,14 +84,14 @@ def execute_query(query, params=None, fetch=False):
 # Gerenciamento de Usuários
 def user_menu():
     while True:
-        print("\n--- Gerenciamento de Usuários ---")
+        print("\n--- Gerenciar Usuários ---")
         print("1. Inserir Usuário")
         print("2. Atualizar Usuário")
         print("3. Excluir Usuário")
         print("4. Consultar Usuários")
         print("5. Voltar")
-        print("---------------------------------")
-
+        print("--------------------------")
+        
         choice = input("Escolha uma opção: ").strip()
         if choice == '1':
             insert_user()
@@ -103,35 +102,35 @@ def user_menu():
         elif choice == '4':
             query_users()
         elif choice == '5':
-            break
+            return
         else:
             print("Opção inválida. Tente novamente.")
 
 def insert_user():
     nome = input("Digite o nome do usuário: ").strip()
-    email = input("Digite o e-mail: ").strip()
+    email = input("Digite o email: ").strip()
     senha = input("Digite a senha: ").strip()
-    nascimento = input("Digite a data de nascimento (YYYY-MM-DD): ").strip()
+    dt_nascimento = input("Digite a data de nascimento (YYYY-MM-DD): ").strip()
 
-    if validate_date(nascimento):
+    if validate_date(dt_nascimento):
         query = """INSERT INTO t_usuario (id_usuario, nm_usuario, ds_email, ds_senha, dt_nascimento)
-                   VALUES (seq_usuario.NEXTVAL, :nome, :email, :senha, TO_DATE(:nascimento, 'YYYY-MM-DD'))"""
-        execute_query(query, {'nome': nome, 'email': email, 'senha': senha, 'nascimento': nascimento})
+                   VALUES (seq_usuario.NEXTVAL, :nome, :email, :senha, TO_DATE(:dt_nascimento, 'YYYY-MM-DD'))"""
+        execute_query(query, {'nome': nome, 'email': email, 'senha': senha, 'dt_nascimento': dt_nascimento})
         print("Usuário inserido com sucesso!")
 
 def update_user():
     id_usuario = input("Digite o ID do usuário a ser atualizado: ").strip()
     nome = input("Digite o novo nome: ").strip()
-    email = input("Digite o novo e-mail: ").strip()
+    email = input("Digite o novo email: ").strip()
     senha = input("Digite a nova senha: ").strip()
-    nascimento = input("Digite a nova data de nascimento (YYYY-MM-DD): ").strip()
+    dt_nascimento = input("Digite a nova data de nascimento (YYYY-MM-DD): ").strip()
 
-    if validate_date(nascimento):
+    if validate_date(dt_nascimento):
         query = """UPDATE t_usuario
                    SET nm_usuario = :nome, ds_email = :email, ds_senha = :senha, 
-                       dt_nascimento = TO_DATE(:nascimento, 'YYYY-MM-DD')
+                       dt_nascimento = TO_DATE(:dt_nascimento, 'YYYY-MM-DD')
                    WHERE id_usuario = :id_usuario"""
-        execute_query(query, {'nome': nome, 'email': email, 'senha': senha, 'nascimento': nascimento, 'id_usuario': id_usuario})
+        execute_query(query, {'nome': nome, 'email': email, 'senha': senha, 'dt_nascimento': dt_nascimento, 'id_usuario': id_usuario})
         print("Usuário atualizado com sucesso!")
 
 def delete_user():
@@ -145,21 +144,21 @@ def query_users():
     results = execute_query(query, fetch=True)
     if results:
         for row in results:
-            print(f"ID: {row[0]}, Nome: {row[1]}, E-mail: {row[2]}, Nascimento: {row[3]}")
+            print(f"ID: {row[0]}, Nome: {row[1]}, Email: {row[2]}, Data de Nascimento: {row[3]}")
     else:
         print("Nenhum usuário encontrado.")
         
 # Gerenciamento de Ideias
 def ideas_menu():
     while True:
-        print("\n--- Gerenciamento de Ideias ---")
+        print("\n--- Gerenciar Ideias ---")
         print("1. Inserir Ideia")
         print("2. Atualizar Ideia")
         print("3. Excluir Ideia")
         print("4. Consultar Ideias")
         print("5. Voltar")
-        print("-------------------------------")
-
+        print("------------------------")
+        
         choice = input("Escolha uma opção: ").strip()
         if choice == '1':
             insert_idea()
@@ -170,36 +169,30 @@ def ideas_menu():
         elif choice == '4':
             query_ideas()
         elif choice == '5':
-            break
+            return
         else:
             print("Opção inválida. Tente novamente.")
 
 def insert_idea():
-    titulo = input("Digite o título da ideia: ").strip()
-    descricao = input("Digite a descrição da ideia: ").strip()
-    categoria = input("Digite a categoria da ideia: ").strip()
-    data_criacao = input("Digite a data de criação (YYYY-MM-DD): ").strip()
+    id_usuario = input("Digite o ID do usuário: ").strip()
+    nm_ideia = input("Digite o nome da ideia: ").strip()
+    ds_descricao = input("Digite a descrição da ideia: ").strip()
 
-    if validate_date(data_criacao):
-        query = """INSERT INTO t_ideias (id_ideia, ds_titulo, ds_descricao, ds_categoria, dt_criacao)
-                   VALUES (seq_ideia.NEXTVAL, :titulo, :descricao, :categoria, TO_DATE(:data_criacao, 'YYYY-MM-DD'))"""
-        execute_query(query, {'titulo': titulo, 'descricao': descricao, 'categoria': categoria, 'data_criacao': data_criacao})
-        print("Ideia inserida com sucesso!")
+    query = """INSERT INTO t_ideias (id_ideia, id_usuario, nm_ideia, ds_descricao)
+               VALUES (seq_ideias.NEXTVAL, :id_usuario, :nm_ideia, :ds_descricao)"""
+    execute_query(query, {'id_usuario': id_usuario, 'nm_ideia': nm_ideia, 'ds_descricao': ds_descricao})
+    print("Ideia inserida com sucesso!")
 
 def update_idea():
     id_ideia = input("Digite o ID da ideia a ser atualizada: ").strip()
-    titulo = input("Digite o novo título: ").strip()
-    descricao = input("Digite a nova descrição: ").strip()
-    categoria = input("Digite a nova categoria: ").strip()
-    data_criacao = input("Digite a nova data de criação (YYYY-MM-DD): ").strip()
+    nm_ideia = input("Digite o novo nome: ").strip()
+    ds_descricao = input("Digite a nova descrição: ").strip()
 
-    if validate_date(data_criacao):
-        query = """UPDATE t_ideias
-                   SET ds_titulo = :titulo, ds_descricao = :descricao, ds_categoria = :categoria,
-                       dt_criacao = TO_DATE(:data_criacao, 'YYYY-MM-DD')
-                   WHERE id_ideia = :id_ideia"""
-        execute_query(query, {'titulo': titulo, 'descricao': descricao, 'categoria': categoria, 'data_criacao': data_criacao, 'id_ideia': id_ideia})
-        print("Ideia atualizada com sucesso!")
+    query = """UPDATE t_ideias
+               SET nm_ideia = :nm_ideia, ds_descricao = :ds_descricao
+               WHERE id_ideia = :id_ideia"""
+    execute_query(query, {'nm_ideia': nm_ideia, 'ds_descricao': ds_descricao, 'id_ideia': id_ideia})
+    print("Ideia atualizada com sucesso!")
 
 def delete_idea():
     id_ideia = input("Digite o ID da ideia a ser excluída: ").strip()
@@ -208,25 +201,25 @@ def delete_idea():
     print("Ideia excluída com sucesso!")
 
 def query_ideas():
-    query = "SELECT id_ideia, ds_titulo, ds_descricao, ds_categoria, dt_criacao FROM t_ideias ORDER BY id_ideia"
+    query = "SELECT id_ideia, id_usuario, nm_ideia, ds_descricao FROM t_ideias ORDER BY id_ideia"
     results = execute_query(query, fetch=True)
     if results:
         for row in results:
-            print(f"ID: {row[0]}, Título: {row[1]}, Descrição: {row[2]}, Categoria: {row[3]}, Data de Criação: {row[4]}")
+            print(f"ID: {row[0]}, ID Usuário: {row[1]}, Nome: {row[2]}, Descrição: {row[3]}")
     else:
         print("Nenhuma ideia encontrada.")
 
 # Gerenciamento de Serviços
 def services_menu():
     while True:
-        print("\n--- Gerenciamento de Serviços ---")
+        print("\n--- Gerenciar Serviços ---")
         print("1. Inserir Serviço")
         print("2. Atualizar Serviço")
         print("3. Excluir Serviço")
         print("4. Consultar Serviços")
         print("5. Voltar")
-        print("---------------------------------")
-
+        print("-------------------------")
+        
         choice = input("Escolha uma opção: ").strip()
         if choice == '1':
             insert_service()
@@ -237,36 +230,32 @@ def services_menu():
         elif choice == '4':
             query_services()
         elif choice == '5':
-            break
+            return
         else:
             print("Opção inválida. Tente novamente.")
 
 def insert_service():
-    nome = input("Digite o nome do serviço: ").strip()
-    descricao = input("Digite a descrição do serviço: ").strip()
-    preco = input("Digite o preço do serviço: ").strip()
-    data_criacao = input("Digite a data de criação (YYYY-MM-DD): ").strip()
+    id_usuario = input("Digite o ID do usuário: ").strip()
+    nm_servico = input("Digite o nome do serviço: ").strip()
+    ds_servico = input("Digite a descrição do serviço: ").strip()
+    tipo_servico = input("Digite o tipo do serviço: ").strip()
 
-    if validate_date(data_criacao):
-        query = """INSERT INTO t_servicos (id_servico, nm_servico, ds_descricao, vl_preco, dt_criacao)
-                   VALUES (seq_servico.NEXTVAL, :nome, :descricao, :preco, TO_DATE(:data_criacao, 'YYYY-MM-DD'))"""
-        execute_query(query, {'nome': nome, 'descricao': descricao, 'preco': preco, 'data_criacao': data_criacao})
-        print("Serviço inserido com sucesso!")
+    query = """INSERT INTO t_servicos (id_servico, id_usuario, nm_servico, ds_servico, tipo_servico)
+               VALUES (seq_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_servico, :tipo_servico)"""
+    execute_query(query, {'id_usuario': id_usuario, 'nm_servico': nm_servico, 'ds_servico': ds_servico, 'tipo_servico': tipo_servico})
+    print("Serviço inserido com sucesso!")
 
 def update_service():
     id_servico = input("Digite o ID do serviço a ser atualizado: ").strip()
-    nome = input("Digite o novo nome do serviço: ").strip()
-    descricao = input("Digite a nova descrição: ").strip()
-    preco = input("Digite o novo preço: ").strip()
-    data_criacao = input("Digite a nova data de criação (YYYY-MM-DD): ").strip()
+    nm_servico = input("Digite o novo nome do serviço: ").strip()
+    ds_servico = input("Digite a nova descrição do serviço: ").strip()
+    tipo_servico = input("Digite o novo tipo do serviço: ").strip()
 
-    if validate_date(data_criacao):
-        query = """UPDATE t_servicos
-                   SET nm_servico = :nome, ds_descricao = :descricao, vl_preco = :preco,
-                       dt_criacao = TO_DATE(:data_criacao, 'YYYY-MM-DD')
-                   WHERE id_servico = :id_servico"""
-        execute_query(query, {'nome': nome, 'descricao': descricao, 'preco': preco, 'data_criacao': data_criacao, 'id_servico': id_servico})
-        print("Serviço atualizado com sucesso!")
+    query = """UPDATE t_servicos
+               SET nm_servico = :nm_servico, ds_servico = :ds_servico, tipo_servico = :tipo_servico
+               WHERE id_servico = :id_servico"""
+    execute_query(query, {'nm_servico': nm_servico, 'ds_servico': ds_servico, 'tipo_servico': tipo_servico, 'id_servico': id_servico})
+    print("Serviço atualizado com sucesso!")
 
 def delete_service():
     id_servico = input("Digite o ID do serviço a ser excluído: ").strip()
@@ -275,11 +264,11 @@ def delete_service():
     print("Serviço excluído com sucesso!")
 
 def query_services():
-    query = "SELECT id_servico, nm_servico, ds_descricao, vl_preco, dt_criacao FROM t_servicos ORDER BY id_servico"
+    query = "SELECT id_servico, id_usuario, nm_servico, ds_servico, tipo_servico FROM t_servicos ORDER BY id_servico"
     results = execute_query(query, fetch=True)
     if results:
         for row in results:
-            print(f"ID: {row[0]}, Nome: {row[1]}, Descrição: {row[2]}, Preço: {row[3]}, Data de Criação: {row[4]}")
+            print(f"ID: {row[0]}, ID Usuário: {row[1]}, Nome: {row[2]}, Descrição: {row[3]}, Tipo: {row[4]}")
     else:
         print("Nenhum serviço encontrado.")
 

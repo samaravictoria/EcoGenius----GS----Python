@@ -37,16 +37,14 @@ Oracle Database e possui as seguintes tabelas principais:
   - `nm_usuario`: Nome do usuário.
   - `ds_email`: E-mail do usuário.
   - `ds_senha`: Senha (criptografada) do usuário.
-  - `dt_cadastro`: Data de cadastro.
+  - `dt_nascimento`: Data de nascimento.
 
 ### 2. Tabela `t_ideias`
 - Descrição: Armazena ideias criadas pelos usuários.
 - Campos:
   - `id_ideia`: ID único da ideia.
-  - `ds_titulo`: Título da ideia.
+  - `nm_ideia`: Nome da ideia.
   - `ds_descricao`: Descrição detalhada da ideia.
-  - `ds_categoria`: Categoria da ideia (e.g., energia renovável, reciclagem).
-  - `dt_criacao`: Data de criação da ideia.
 
 ### 3. Tabela `t_servicos`
 - Descrição: Gerencia serviços ecológicos cadastrados na plataforma.
@@ -54,9 +52,7 @@ Oracle Database e possui as seguintes tabelas principais:
   - `id_servico`: ID único do serviço.
   - `nm_servico`: Nome do serviço.
   - `ds_descricao`: Descrição do serviço.
-  - `vl_preco`: Preço do serviço.
-  - `dt_criacao`: Data de criação do serviço.
-
+  - `tipo_servico`: Tipo do serviço.
 
 ### Relacionamentos
 O banco foi projetado para ser modular e extensível, 
