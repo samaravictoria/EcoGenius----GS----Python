@@ -1,7 +1,6 @@
 import cx_Oracle
 import json
 from datetime import datetime
-import cx_Oracle
 
 # Configurações do banco de dados
 DB_USER = 'rm558043'
@@ -237,7 +236,38 @@ def services_menu():
 def insert_service():
     id_usuario = input("Digite o ID do usuário: ").strip()
     nm_servico = input("Digite o nome do serviço: ").strip()
-    ds_servico = input("Digite a descrição do serviço: ").strip()
+    ds_descricao = input("Digite a descrição do serviço: ").strip()
+
+    query = """INSERT INTO t_servicos (id_servico, id_usuario, nm_servico, ds_descricao)
+               VALUES (seq_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_descricao)"""
+    execute_query(query, {'id_usuario': id_usuario, 'nm_servico': nm_servico, 'ds_descricao': ds_descricao})
+    print("Serviço inserido com sucesso!")
+
+def update_service():
+    id_servico = input("Digite o ID do serviço a ser atualizado: ").strip()
+    nm_servico = input("Digite o novo nome do serviço: ").strip()
+    ds_descricao = input("Digite a nova descrição: ").strip()
+
+    query = """UPDATE t_servicos
+               SET nm_servico = :nm_servico, ds_descricao = :ds_descricao
+               WHERE id_servico = :id_servico"""
+    execute_query(query, {'nm_servico': nm_servico, 'ds_descricao': ds_descricao, 'id_servico': id_servico})
+    print("Serviço atualizado com sucesso!")
+
+def delete_service():
+    id_servico = input("Digite o ID do serviço a ser excluído: ").strip()
+    query = "DELETE FROM t_servicos WHERE id_servico = :id_servico"
+    execute_query(query, {'id_servico': id_servico})
+    print("Serviço excluído com sucesso!")
+
+def query_services():
+    query = "SELECT id_servico, id_usuario, nm_servico, ds_descricao FROM t_servicos ORDER BY id_servico"
+    results = execute_query(query, fetch=True)
+    if results:
+        for row in results:
+            print(f"ID: {row[0]}, ID Usuário: {row[1]}, Nome: {row[2]}, Descrição: {row[3]}")
+    else:
+        print("Nenhum serviço encontrado.")
 
     # Validando o tipo de serviço
     while True:
@@ -251,11 +281,6 @@ def insert_service():
                VALUES (seq_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_servico, :tipo_servico)"""
     execute_query(query, {'id_usuario': id_usuario, 'nm_servico': nm_servico, 'ds_servico': ds_servico, 'tipo_servico': tipo_servico})
     print("Serviço inserido com sucesso!")
-
-def update_service():
-    id_servico = input("Digite o ID do serviço a ser atualizado: ").strip()
-    nm_servico = input("Digite o novo nome do serviço: ").strip()
-    ds_servico = input("Digite a nova descrição do serviço: ").strip()
 
     # Validando o tipo de serviço
     while True:
@@ -299,19 +324,22 @@ def query_users_by_name():
         results = execute_query(query, {'nome': f'%{nome}%'}, fetch=True)
         
         if results:
+            # Cria uma conexão para pegar as colunas (se necessário)
             connection = get_connection()
             cursor = connection.cursor()
             cursor.execute(query, {'nome': f'%{nome}%'})
             colunas = [desc[0] for desc in cursor.description]  # Pegando os nomes das colunas
             
-            dados = [dict(zip(colunas, linha)) for linha in results]  # Criando um dicionário com os dados
+            # Criando um dicionário com os dados
+            dados = [dict(zip(colunas, linha)) for linha in results]
+            
             print(f"\nUsuários encontrados com o nome '{nome}':")
-            for dado in dados:
-                print(dado)
+            for usuario in dados:
+                print(f"ID: {usuario['ID_USUARIO']}, Nome: {usuario['NM_USUARIO']}, Email: {usuario['DS_EMAIL']}, Data de Nascimento: {usuario['DT_NASCIMENTO']}")
         else:
             print("Nenhum usuário encontrado com esse nome.")
     except Exception as e:
-        print(f"Ocorreu um erro: {e}")
+        print(f"Erro ao consultar os usuários: {e}")
 
 # Consulta 2: Filtrar ideias por nome
 def query_ideas_by_name():
@@ -369,18 +397,55 @@ def query_ideas_by_description():
 
 # Exportação de dados para JSON
 def export_data_menu():
-    tabela = input("Digite o nome da tabela para exportar (t_usuario, t_ideias, t_servicos): ").strip()
-    query = f"SELECT * FROM {tabela}"
+    while True:
+        print("\n--- Exportar Dados ---")
+        print("1. Exportar Usuários")
+        print("2. Exportar Ideias")
+        print("3. Exportar Serviços")
+        print("4. Voltar")
+        print("-----------------------")
+        
+        choice = input("Escolha uma opção: ").strip()
+        if choice == '1':
+            export_users()
+        elif choice == '2':
+            export_ideas()
+        elif choice == '3':
+            export_services()
+        elif choice == '4':
+            return
+        else:
+            print("Opção inválida. Tente novamente.")
+
+def export_users():
+    query = "SELECT id_usuario, nm_usuario, ds_email, dt_nascimento FROM t_usuario"
     results = execute_query(query, fetch=True)
     if results:
-        colunas = [desc[0] for desc in get_connection().cursor().description]
-        dados = [dict(zip(colunas, linha)) for linha in results]
-
-        with open(f"{tabela}.json", "w", encoding="utf-8") as json_file:
-            json.dump(dados, json_file, ensure_ascii=False, indent=4)
-        print(f"Dados exportados para {tabela}.json com sucesso!")
+        with open('users.json', 'w') as f:
+            json.dump(results, f, default=str)
+        print("Usuários exportados para 'users.json'")
     else:
-        print(f"Nenhum dado encontrado na tabela {tabela}.")
+        print("Nenhum dado de usuário encontrado para exportação.")
+
+def export_ideas():
+    query = "SELECT id_ideia, id_usuario, nm_ideia, ds_descricao FROM t_ideias"
+    results = execute_query(query, fetch=True)
+    if results:
+        with open('ideas.json', 'w') as f:
+            json.dump(results, f, default=str)
+        print("Ideias exportadas para 'ideas.json'")
+    else:
+        print("Nenhum dado de ideia encontrado para exportação.")
+
+def export_services():
+    query = "SELECT id_servico, id_usuario, nm_servico, ds_descricao FROM t_servicos"
+    results = execute_query(query, fetch=True)
+    if results:
+        with open('services.json', 'w') as f:
+            json.dump(results, f, default=str)
+        print("Serviços exportados para 'services.json'")
+    else:
+        print("Nenhum dado de serviço encontrado para exportação.")
 
 # Inicialização do sistema
 if __name__ == "__main__":
