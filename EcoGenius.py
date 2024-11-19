@@ -113,7 +113,7 @@ def insert_user():
 
     if validate_date(dt_nascimento):
         query = """INSERT INTO t_usuario (id_usuario, nm_usuario, ds_email, ds_senha, dt_nascimento)
-                   VALUES (seq_usuario.NEXTVAL, :nome, :email, :senha, TO_DATE(:dt_nascimento, 'YYYY-MM-DD'))"""
+                   VALUES (sq_t_usuario.NEXTVAL, :nome, :email, :senha, TO_DATE(:dt_nascimento, 'YYYY-MM-DD'))"""
         execute_query(query, {'nome': nome, 'email': email, 'senha': senha, 'dt_nascimento': dt_nascimento})
         print("Usuário inserido com sucesso!")
 
@@ -178,7 +178,7 @@ def insert_idea():
     ds_descricao = input("Digite a descrição da ideia: ").strip()
 
     query = """INSERT INTO t_ideias (id_ideia, id_usuario, nm_ideia, ds_descricao)
-               VALUES (seq_ideias.NEXTVAL, :id_usuario, :nm_ideia, :ds_descricao)"""
+               VALUES (sq_t_ideias.NEXTVAL, :id_usuario, :nm_ideia, :ds_descricao)"""
     execute_query(query, {'id_usuario': id_usuario, 'nm_ideia': nm_ideia, 'ds_descricao': ds_descricao})
     print("Ideia inserida com sucesso!")
 
@@ -239,7 +239,7 @@ def insert_service():
     ds_descricao = input("Digite a descrição do serviço: ").strip()
 
     query = """INSERT INTO t_servicos (id_servico, id_usuario, nm_servico, ds_descricao)
-               VALUES (seq_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_descricao)"""
+               VALUES (sq_t_servicos.NEXTVAL, :id_usuario, :nm_servico, :ds_descricao)"""
     execute_query(query, {'id_usuario': id_usuario, 'nm_servico': nm_servico, 'ds_descricao': ds_descricao})
     print("Serviço inserido com sucesso!")
 
