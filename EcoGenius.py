@@ -11,7 +11,7 @@ SID = 'orcl'
 
 # Inicializa o cliente Oracle
 try:
-    cx_Oracle.init_oracle_client(lib_dir=r"C:\instantclient-basic-windows.x64-23.5.0.24.07\instantclient_23_5")
+    cx_Oracle.init_oracle_client(lib_dir=r"C:/Program Files/instantclient_23_5 (1)/instantclient_23_5")
 except Exception as e:
     print("Erro na inicialização do 'client': ", e)
 else:
